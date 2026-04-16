@@ -1,0 +1,33 @@
+{
+  "name": "@textportico/provider-twilio",
+  "version": "0.0.1",
+  "description": "Optional Twilio SMS sender for Text Portico consumers",
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "twilio": "^5.6.1",
+    "typescript": "^5.8.3"
+  },
+  "peerDependencies": {
+    "twilio": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "twilio": {
+      "optional": true
+    }
+  }
+}

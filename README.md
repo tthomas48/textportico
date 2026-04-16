@@ -2,15 +2,15 @@
 
 Text Portico is a **development tool** inspired by [MailDev](https://github.com/maildev/maildev): it **captures SMS-like traffic** in dev, shows it in a **phone-style web UI**, and exposes a **REST API** for tests. In production you use a **real provider** (for example Twilio via `@textportico/provider-twilio`) instead of the dev server.
 
-| MailDev | Text Portico |
-|--------|----------------|
+| MailDev                    | Text Portico                    |
+| -------------------------- | ------------------------------- |
 | Catches mail over **SMTP** | Apps send/capture over **HTTP** |
-| Web UI like a mail client | Web UI like an **SMS thread** |
-| Optional relay / outgoing | Optional **Twilio** send plugin |
+| Web UI like a mail client  | Web UI like an **SMS thread**   |
+| Optional relay / outgoing  | Optional **Twilio** send plugin |
 
 ## Prerequisites
 
-- **Node.js** ≥ 22.12 (see `engines` in the root [package.json](package.json)).
+- **Node.js** ≥ 22.12 (see `engines` in the root [package.json](package.json)). For local development, set **`NODE_ENV=development`** when running the core server (the `pnpm run dev` script does this for `@textportico/core`).
 - **pnpm** (Corepack: `corepack enable` then use the repo’s `packageManager` field).
 - **Vite+** local CLI: `pnpm exec vp …` from the repo root (the `vite-plus` package ships the `vp` binary). For global install, see [viteplus.dev](https://viteplus.dev/).
 
@@ -43,38 +43,38 @@ await portico.close();
 
 ## Common commands
 
-| Command | Purpose |
-|--------|---------|
-| `pnpm exec vp check` | Format, lint, and typecheck (Vite+) |
-| `pnpm exec vp test` | Run tests |
-| `pnpm run build` | Build web UI then compile `@textportico/core` |
-| `pnpm run dev` | Run core dev server (serves API + built UI when `packages/web/dist` exists) |
+| Command              | Purpose                                                                     |
+| -------------------- | --------------------------------------------------------------------------- |
+| `pnpm exec vp check` | Format, lint, and typecheck (Vite+)                                         |
+| `pnpm exec vp test`  | Run tests                                                                   |
+| `pnpm run build`     | Build web UI then compile `@textportico/core`                               |
+| `pnpm run dev`       | Run core dev server (serves API + built UI when `packages/web/dist` exists) |
 
 Build the UI once before `dev` if `dist` is missing: `pnpm --filter @textportico/web build`.
 
 ## Configuration
 
-| Variable / option | Description |
-|-------------------|-------------|
-| `TEXTPORTICO_DATA_DIR` | Directory for **one JSON file per message** (MailDev-style flat files). Default: a subdirectory under the OS **temp** dir (may be cleared on reboot). |
-| `TEXTPORTICO_PORT` | HTTP port (default `3847`). |
-| `TEXTPORTICO_HOST` | Bind address (default `127.0.0.1`). |
-| `notifyUrl` | If set, Text Portico **POST**s `textportico.notify.v1` JSON after each persisted message (best-effort; failures are logged; the message file still exists). |
-| `replyWebhookUrl` | If set and reply webhooks are enabled, the UI can POST **Twilio-like** inbound payloads to this URL when you send a reply from the browser. |
+| Variable / option      | Description                                                                                                                                                 |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TEXTPORTICO_DATA_DIR` | Directory for **one JSON file per message** (MailDev-style flat files). Default: a subdirectory under the OS **temp** dir (may be cleared on reboot).       |
+| `TEXTPORTICO_PORT`     | HTTP port (default `3847`).                                                                                                                                 |
+| `TEXTPORTICO_HOST`     | Bind address (default `127.0.0.1`).                                                                                                                         |
+| `notifyUrl`            | If set, Text Portico **POST**s `textportico.notify.v1` JSON after each persisted message (best-effort; failures are logged; the message file still exists). |
+| `replyWebhookUrl`      | If set and reply webhooks are enabled, the UI can POST **Twilio-like** inbound payloads to this URL when you send a reply from the browser.                 |
 
 ## REST API (v1)
 
 Base path: `/api`.
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/messages/outbound` | JSON `{ "from", "to", "body" }` — capture outbound dev send. |
-| `POST` | `/messages/inbound` | JSON or `x-www-form-urlencoded` (`From`, `To`, `Body`) — simulated inbound. |
-| `GET` | `/messages` | List messages. Query: `to`, `threadId`. |
-| `GET` | `/messages/:id` | Get one message. |
-| `DELETE` | `/messages/:id` | Delete one message file. |
-| `DELETE` | `/messages` | Delete all messages in `dataDir`. |
-| `GET` | `/config` | UI: flags for reply webhooks, `ws` URL hint. |
+| Method   | Path                 | Description                                                                 |
+| -------- | -------------------- | --------------------------------------------------------------------------- |
+| `POST`   | `/messages/outbound` | JSON `{ "from", "to", "body" }` — capture outbound dev send.                |
+| `POST`   | `/messages/inbound`  | JSON or `x-www-form-urlencoded` (`From`, `To`, `Body`) — simulated inbound. |
+| `GET`    | `/messages`          | List messages. Query: `to`, `threadId`.                                     |
+| `GET`    | `/messages/:id`      | Get one message.                                                            |
+| `DELETE` | `/messages/:id`      | Delete one message file.                                                    |
+| `DELETE` | `/messages`          | Delete all messages in `dataDir`.                                           |
+| `GET`    | `/config`            | UI: flags for reply webhooks, `ws` URL hint.                                |
 
 WebSocket: connect to `/ws` for `message.created` / `message.deleted` events (same-origin as the HTTP server).
 

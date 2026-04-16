@@ -1,12 +1,25 @@
 {
-  "name": "textportico",
-  "version": "1.0.0",
-  "description": "Text Portico collects and shelters your sms messages and presets them in a Web UI in your test environment. In production it passes them right through to the street. ",
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
-  "main": "index.js",
+  "name": "textportico-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Text Portico — dev SMS capture, Web UI, and HTTP notify (monorepo)",
+  "license": "MIT",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  }
+    "build": "pnpm --filter @textportico/web build && pnpm --filter @textportico/core build && pnpm --filter @textportico/provider-twilio build",
+    "dev": "pnpm --filter @textportico/core dev",
+    "check": "pnpm exec vp check",
+    "test": "pnpm exec vp test",
+    "fmt": "pnpm exec vp fmt"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.1",
+    "typescript": "^5.8.3",
+    "vite-plus": "0.1.18",
+    "vitest": "^3.2.4"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "packageManager": "pnpm@10.30.2"
 }

@@ -1,10 +1,14 @@
+import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { TextPortico } from './text-portico.js';
 import { NOTIFY_SCHEMA } from './types.js';
+
+const monorepoWebDist = join(dirname(fileURLToPath(import.meta.url)), '..', '..', 'web', 'dist');
 
 describe('TextPortico HTTP API', () => {
   let dataDir: string;
@@ -86,6 +90,17 @@ describe('TextPortico HTTP API', () => {
     const empty = (await after.json()) as { messages: unknown[] };
     expect(empty.messages).toHaveLength(0);
   });
+
+  it.skipIf(!existsSync(monorepoWebDist))(
+    'serves web UI at GET / when web dist exists',
+    async () => {
+      const res = await fetch(`${baseUrl}/`);
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain('Text Portico');
+      expect(html).not.toContain('Build the web UI');
+    },
+  );
 
   it('rejects path traversal attempts via message id', async () => {
     const escapedPath = join(dataDir, '..', 'textportico-escape-target.json');

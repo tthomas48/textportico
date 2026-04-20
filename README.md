@@ -24,6 +24,17 @@ From the monorepo root:
 pnpm install
 ```
 
+### From npm (published releases)
+
+Packages **`@textportico/core`** and **`@textportico/provider-twilio`** are published under the `@textportico` scope. Core includes the **built web UI** (Vite output copied into `dist/web` at publish time), so a running `TextPortico` server serves the SMS-style UI at `/` without building this repo locally. Override the static path with **`TEXTPORTICO_WEB_DIST`** if you need a custom UI.
+
+```bash
+npm install @textportico/core
+npm install @textportico/provider-twilio # optional Twilio-backed sender
+```
+
+**Maintainers:** bump the same **`version`** in [packages/core/package.json](packages/core/package.json) and [packages/provider-twilio/package.json](packages/provider-twilio/package.json), tag, then create a **GitHub Release** to trigger [.github/workflows/publish-npm.yml](.github/workflows/publish-npm.yml). Add an npm **Automation** access token as the repository secret **`NPM_TOKEN`** (used as `NODE_AUTH_TOKEN` for `actions/setup-node`).
+
 ## Quick start (programmatic)
 
 Embed the dev server in tests or local tooling. Integration with your stack is **HTTP POST to your API** (`notifyUrl`), not in-process Node events—so downstream code can **enqueue to a message bus** the same way it would in staging.
@@ -43,14 +54,14 @@ await portico.close();
 
 ## Common commands
 
-| Command              | Purpose                                                                     |
-| -------------------- | --------------------------------------------------------------------------- |
-| `pnpm exec vp check` | Format, lint, and typecheck (Vite+)                                         |
-| `pnpm exec vp test`  | Run tests                                                                   |
-| `pnpm run build`     | Build web UI then compile `@textportico/core`                               |
-| `pnpm run dev`       | Run core dev server (serves API + built UI when `packages/web/dist` exists) |
+| Command              | Purpose                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------- |
+| `pnpm exec vp check` | Format, lint, and typecheck (Vite+)                                                         |
+| `pnpm exec vp test`  | Run tests                                                                                   |
+| `pnpm run build`     | Build web UI, copy it into `packages/core/dist/web`, then compile core and provider         |
+| `pnpm run dev`       | Run core dev server (serves API + UI when `packages/web/dist` or bundled `dist/web` exists) |
 
-Build the UI once before `dev` if `dist` is missing: `pnpm --filter @textportico/web build`.
+Build the UI once before `dev` if assets are missing: `pnpm --filter @textportico/web build` (or run `pnpm run build`, which also runs `pnpm --filter @textportico/core build` and copies the web build into core’s `dist/web`).
 
 ## Configuration
 
@@ -111,7 +122,8 @@ Bind to **127.0.0.1** by default. The dev server and REST API have **no authenti
 
 ## CI
 
-GitHub Actions can install Vite+ with [voidzero-dev/setup-vp](https://github.com/voidzero-dev/setup-vp) (see [.github/workflows/ci.yml](.github/workflows/ci.yml)).
+- [.github/workflows/ci.yml](.github/workflows/ci.yml): install, check, build, test on push and pull requests (uses [voidzero-dev/setup-vp](https://github.com/voidzero-dev/setup-vp)).
+- [.github/workflows/publish-npm.yml](.github/workflows/publish-npm.yml): on **published** GitHub Releases, check, build, test, then publish **`@textportico/core`** and **`@textportico/provider-twilio`** to the public npm registry (requires secret **`NPM_TOKEN`**).
 
 ## License
 

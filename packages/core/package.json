@@ -15,8 +15,11 @@
       "import": "./dist/index.js"
     }
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "tsc -p tsconfig.build.json && node ./scripts/copy-web.mjs",
     "dev": "NODE_ENV=development tsx watch src/cli-dev.ts"
   },
   "dependencies": {

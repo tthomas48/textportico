@@ -33,7 +33,15 @@ function resolveDataDir(dir?: string): string {
 
 function defaultWebDist(): string {
   const here = dirname(fileURLToPath(import.meta.url));
-  return pathJoin(here, '..', '..', 'web', 'dist');
+  const bundled = pathJoin(here, 'web');
+  if (existsSync(bundled)) {
+    return bundled;
+  }
+  const monorepoWeb = pathJoin(here, '..', '..', 'web', 'dist');
+  if (existsSync(monorepoWeb)) {
+    return monorepoWeb;
+  }
+  return bundled;
 }
 
 function buildMessage(
